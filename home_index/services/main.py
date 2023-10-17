@@ -5,52 +5,48 @@ from email.mime.text import MIMEText
 
 app = Flask(__name__)
 
-def enviar_email(sender_email, sender_password, destinatario_email, assunto, corpo):
-    # Configurar o servidor SMTP do Google
-    servidor_smtp = "smtp.gmail.com"
-    porta_smtp = 587
+USERNAME = "af7f3358846937e3dc1690da6d2258a1"
+PASSWORD = "1d14b7522cee9a57410cc2985a5cc035"
+SMTP_HOST = "in-v3.mailjet.com"
+SMTP_PORT = 587
+SENDER = "nunopinto1519966@gmail.com"
 
-    # Criar objeto MIMEMultipart para construir o e-mail
-    mensagem = MIMEMultipart()
-    mensagem['From'] = sender_email
-    mensagem['To'] = destinatario_email
-    mensagem['Subject'] = assunto
+def send_email(subject, body):
+    # Configure the Google SMTP server
 
-    # Adicionar o corpo do e-mail
-    mensagem.attach(MIMEText(corpo, 'plain'))
+    # Create a MIMEMultipart object to construct the email
+    message = MIMEMultipart()
+    message['To'] = SENDER
+    message['Subject'] = subject
+
+    # Add the email body
+    message.attach(MIMEText(body, 'plain'))
 
     try:
-        # Iniciar uma conexão SMTP segura com o servidor
-        servidor = smtplib.SMTP(servidor_smtp, porta_smtp)
-        servidor.starttls()
+        # Start a secure SMTP connection with the server
+        server = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
+        server.starttls()
+        # Log in with the sender's credentials
+        server.login(USERNAME, PASSWORD)
+        # Send the email
+        server.sendmail(SENDER, SENDER, message.as_string())
+        # Close the SMTP connection
+        server.quit()
 
-        # Efetuar login com as credenciais do remetente
-        servidor.login(sender_email, sender_password)
-
-        # Enviar o e-mail
-        servidor.sendmail(sender_email, destinatario_email, mensagem.as_string())
-
-        # Fechar a conexão SMTP
-        servidor.quit()
-
-        return "E-mail enviado com sucesso!"
+        return "Email sent successfully!"
 
     except Exception as e:
-        return f"Erro ao enviar o e-mail: {str(e)}"
+        return f"Error sending email: {str(e)}"
 
-@app.route('/enviar_email', methods=['POST'])
-def enviar_email_api():
+@app.route('/send_mail', methods=['POST'])
+def send_email_api():
     data = request.get_json()
+    subject = data['subject']
+    body = data['body']
 
-    sender_email = data['sender_email']
-    sender_password = data['sender_password']
-    destinatario_email = data['destinatario_email']
-    assunto = data['assunto']
-    corpo = data['corpo']
+    result = send_email(subject, body)
 
-    resultado = enviar_email(sender_email, sender_password, destinatario_email, assunto, corpo)
-
-    return jsonify({"resultado": resultado})
+    return jsonify({"result": result})
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -157,7 +157,6 @@
         <script src="js/jquery.sticky.js"></script>
         <script src="js/jquery.mb.YTPlayer.min.js"></script>
 
-
         <br>
         <br>
         <br>
@@ -467,7 +466,6 @@ var cookie_domain = "www.un3.pt";
 var cookie_prefix = "UN3M";
 var static_dir = "http://www.un3.pt/topografia";
 $(document).ready(function() {
-    init();
     if ($('.lazy').length) {
         $('.lazy').lazyload({skip_invisible:false});       
     }
@@ -482,7 +480,6 @@ var country_lat =  '39.399872';
 var country_lng =  '-8.224454';
 var country_coords = {lat: Number(country_lat), lng: Number(country_lng)};
 
-console.log("user location: " + country_name);
 </script>
 
 <script>
@@ -527,8 +524,6 @@ var mapTypeId = 'hybrid';
 
 function init_map() {
 
-    console.log("country coords:");
-    console.log(country_coords);
     if (country_coords) {
         start_point = country_coords;
     } else {
@@ -570,7 +565,6 @@ function clearAddressInput() {
 </style>
 
 <script>
-// open street maps
 function getCoordsFromOSM(place) {
     if (place.trim() == '') {
         return;
@@ -661,10 +655,39 @@ var url_dir = "map-area";
   
      </div>
 
+ <script>
  
 
+function sendEmail() {
+    fname = document.getElementById("fname").value
+	fapelido = document.getElementById("fapelido").value
+	faddress = document.getElementById("faddress").value
+	ftel = document.getElementById("ftel").value
+	fmessage = document.getElementById("fmessage").value
+	furl = $("#embed_url_a")[0].value
+	
+	fetch("http://127.0.0.1:5000/send_mail", {
+		method: "POST",
+		body: JSON.stringify({
+		subject: document.getElementById("country").value,
+		body:"Nome: "+fname+
+		"\nApelido: "+fapelido+
+		"\nNumero de telemovel: "+ftel+
+		"\nEmail: "+faddress+
+		"\nMensagem: "+fmessage+
+		"\nLink Mapa: "+furl
+	}),
+	headers: {
+		"Content-type": "application/json; charset=UTF-8"
+	}
+	});
+    return true;
+}
+</script>
+
+
         <div class="container">
-            <form id="contact-form" action="enviarestimativa.php" method="POST">
+            <form id="contact-form" onsubmit="return sendEmail();">
 			<input type="hidden" name="link" id="embed_url" value="" />
 			<div class="row">
 
@@ -683,10 +706,10 @@ var url_dir = "map-area";
 					
 	   <label for="Levantamento">Pretendo um Levantamento*</label>
     <select id="country" name="tipolevantamento">
-      <option value="Geral">Serviços gerais topografia</option>
-	  <option value="Drone">Levantamentos aerofotogramétricos Drone</option>
-	  <option value="Arquitectonico">Arquitectonico Fachadas</option>
-      <option value="Fiscalizacao">Acompanhamento e Fiscalização de Obras.</option>
+      <option value="Serviços gerais topografia">Serviços gerais topografia</option>
+	  <option value="Levantamentos aerofotogramétricos Drone">Levantamentos aerofotogramétricos Drone</option>
+	  <option value="Arquitectonico Fachadas">Arquitectonico Fachadas</option>
+      <option value="Acompanhamento e Fiscalização de Obras.">Acompanhamento e Fiscalização de Obras.</option>
       <option value="Outro">Outro</option>
     </select>
 			
@@ -705,20 +728,20 @@ var url_dir = "map-area";
 
                 <div class="col-md-6 form-group">
                     <label for="fname">Apelido</label>
-                    <input type="text" name="ultimonome" id="fname" class="form-control form-control-lg">
+                    <input type="text" name="ultimonome" id="fapelido" class="form-control form-control-lg">
                 </div>
 
 
                 <div class="col-md-6 form-group">
                     <label for="eaddress">Email*</label>
-                    <input type="text" name="email" id="eaddress" class="form-control form-control-lg" required>
+                    <input type="text" name="email" id="faddress" class="form-control form-control-lg" required>
                 </div>
 
 
 
                 <div class="col-md-6 form-group">
                     <label for="tel">Telemóvel</label>
-                    <input type="text" name="telemovel" id="tel" class="form-control form-control-lg">
+                    <input type="text" name="telemovel" id="ftel" class="form-control form-control-lg">
                 </div>
 
 
@@ -727,7 +750,7 @@ var url_dir = "map-area";
 
                 <div class="col-md-12 form-group">
                     <label for="mensagem">Mensagem</label>
-                    <textarea name="mensagem" id="message" cols="30" rows="10" class="form-control"></textarea>
+                    <textarea name="mensagem" id="fmessage" cols="30" rows="10" class="form-control"></textarea>
  
 
 
